@@ -45,14 +45,14 @@
     <a-light type="ambient" intensity="0.7"></a-light>
 
     <!-- Земля (по ній тапаємо) -->
-    <a-box 
-      id="ground"
-      class="cantap"
-      scale="2000 0.2 2000"
-      position="0 -0.1 0"
-      material="shader: flat; color: #228B22; transparent: true; opacity: 0.25"
-      shadow="receive: true">
-    </a-box>
+<a-box 
+  id="ground"
+  class="cantap"
+  scale="2000 0.05 2000"          <!-- тонша -->
+  position="0 -0.8 0"             <!-- опустили вниз -->
+  material="shader: flat; color: #228B22; transparent: true; opacity: 0.15"
+  shadow="receive: true">
+</a-box>
 
     <!-- Текст для проєкту -->
     <a-text 
