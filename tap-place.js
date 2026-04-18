@@ -1,45 +1,52 @@
-// Copyright (c) 2021 8th Wall, Inc. — адаптовано для шкільного проєкту Олесі
 /* globals AFRAME */
 
-// Компонент, який «висаджує» квітку там, де ти тапаєш
 AFRAME.registerComponent('tap-place', {
   init() {
-    const ground = document.getElementById('ground')
+    const ground = document.getElementById('ground');
+    
+    if (!ground) {
+      console.error('Ground element not found! Перевір id="ground" у index.html');
+      return;
+    }
+
     ground.addEventListener('click', (event) => {
-      // Створюємо нову квітку
-      const newElement = document.createElement('a-entity')
+      // Захист: якщо немає точки перетину — нічого не робити
+      if (!event.detail || !event.detail.intersection) return;
 
-      // Точка, куди ти тапнув (з raycaster)
-      const touchPoint = event.detail.intersection.point
-      newElement.setAttribute('position', touchPoint)
-
-      // Випадковий поворот, щоб квіти виглядали природно
-      const randomYRotation = Math.random() * 360
-      newElement.setAttribute('rotation', `0 ${randomYRotation} 0`)
-
-      // Спочатку маленька і невидима
-      newElement.setAttribute('visible', 'false')
-      newElement.setAttribute('scale', '0.0001 0.0001 0.0001')
-
-      // Тінь (щоб реалістично)
-      newElement.setAttribute('shadow', { receive: false })
-
-      // Завантажуємо модель КВІТКИ (замість дерева)
-      newElement.setAttribute('gltf-model', '#flowerModel')
-
+      const newFlower = document.createElement('a-entity');
+      
+      const touchPoint = event.detail.intersection.point;
+      newFlower.setAttribute('position', `${touchPoint.x} ${touchPoint.y + 0.05} ${touchPoint.z}`); // трохи піднімаємо, щоб не провалювалась у землю
+      
+      // Випадковий поворот для природності
+      const rotY = Math.random() * 360;
+      newFlower.setAttribute('rotation', `0 ${rotY} 0`);
+      
+      // Початковий дуже маленький розмір
+      newFlower.setAttribute('scale', '0.01 0.01 0.01');
+      newFlower.setAttribute('visible', 'false');
+      
+      // Модель квітки
+      newFlower.setAttribute('gltf-model', '#flowerModel');
+      
       // Додаємо в сцену
-      this.el.sceneEl.appendChild(newElement)
+      this.el.sceneEl.appendChild(newFlower);
 
-      // Коли модель завантажилася — анімація росту
-      newElement.addEventListener('model-loaded', () => {
-        newElement.setAttribute('visible', 'true')
-        newElement.setAttribute('animation', {
+      // Анімація росту після завантаження моделі
+      newFlower.addEventListener('model-loaded', () => {
+        newFlower.setAttribute('visible', 'true');
+        
+        newFlower.setAttribute('animation', {
           property: 'scale',
-          to: '0.8 0.8 0.8',        // розмір квітки (можна підкоригувати)
+          to: '0.75 0.75 0.75',     // можеш змінити на 0.6 або 0.9, якщо квітка надто велика/мала
           easing: 'easeOutElastic',
-          dur: 1200                  // 1.2 секунди
-        })
-      })
-    })
+          dur: 1400,
+          loop: false
+        });
+      });
+
+      // Опціонально: лог для дебагу
+      console.log('🌸 Квітка посаджена в точці:', touchPoint);
+    });
   }
-})
+});
