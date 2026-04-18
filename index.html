@@ -9,13 +9,13 @@
   <!-- Favicon з емоджі -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
   
-  <!-- Політика безпеки (CSP) – оптимізована для 8th Wall та A-Frame -->
+  <!-- Політика безпеки (CSP) – пом'якшена для 8th Wall, але без небезпечних джерел -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' https://aframe.io https://cdn.aframe.io 'unsafe-eval' 'unsafe-inline';
     style-src 'self' 'unsafe-inline';
     media-src 'self' blob: data:;
-    connect-src 'self' data: blob: https://aframe.io https://cdn.aframe.io;
+    connect-src 'self' data: blob:;
     img-src 'self' data: https://cdn.aframe.io;
     frame-src 'none';
     worker-src 'self' blob:;
@@ -25,7 +25,7 @@
   <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-  <!-- Локальний 8th Wall Engine Binary (покласти xr.js і xr-slam.js в корінь) -->
+  <!-- Локальний 8th Wall Engine Binary -->
   <script src="xr.js" async data-preload-chunks="slam"></script>
 
   <!-- Компонент посадки квітів -->
@@ -94,14 +94,13 @@
 </head>
 <body>
 
-  <!-- Повідомлення про камеру -->
   <div id="camera-consent">
-    <p>📸 <strong>Для гри потрібна камера</strong><br>Відео не записується і не передається в інтернет. Жодні дані не збираються.</p>
+    <p>📸 <strong>Для гри потрібна камера</strong><br>Відео не записується і не передається. Жодні дані не збираються.</p>
     <button id="accept-camera">🌼 Дозволити</button>
     <button id="decline-camera" class="decline">❌ Відмовитись</button>
   </div>
 
-  <!-- AR-сцена (без background="color" – камера показує реальний світ) -->
+  <!-- AR-сцена – без background="color" -->
   <a-scene
     id="scene"
     embedded
@@ -120,7 +119,7 @@
     <a-entity light="type: directional; intensity: 1.0; castShadow: true" position="4 12 6"></a-entity>
     <a-light type="ambient" intensity="0.75"></a-light>
 
-    <!-- Невидима "земля" для рейкастингу -->
+    <!-- Невидима земля для рейкастингу -->
     <a-box
       id="ground"
       class="cantap"
@@ -130,15 +129,22 @@
       visible="false"
     ></a-box>
 
-    <!-- Текст із вбудованим шрифтом A-Frame (без зовнішніх ресурсів) -->
+    <!-- Група для тексту: площина-фон + текст (без атрибута background) -->
+    <a-plane
+      position="0 1.7 -2.75"
+      width="3.4"
+      height="0.7"
+      color="black"
+      opacity="0.65"
+      transparent="true"
+      material="side: double"
+    ></a-plane>
     <a-text
       value="🌸 Торкнись підлоги або столу, щоб посадити квітку"
-      position="0 1.7 -2.8"
+      position="0 1.7 -2.7"
       align="center"
       color="#ffffff"
       width="3.0"
-      background="true"
-      background-color="rgba(0,0,0,0.65)"
     ></a-text>
   </a-scene>
 
@@ -154,7 +160,6 @@
 
     acceptBtn.onclick = () => {
       consentDiv.style.display = 'none';
-      // Запускаємо AR-сесію 8th Wall (якщо компонент готовий)
       if (scene.components && scene.components['xrweb']) {
         scene.components['xrweb'].startSession();
       } else {
