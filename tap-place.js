@@ -5,48 +5,44 @@ AFRAME.registerComponent('tap-place', {
     const ground = document.getElementById('ground');
     
     if (!ground) {
-      console.error('Ground element not found! Перевір id="ground" у index.html');
+      console.error('Ground element not found!');
       return;
     }
 
     ground.addEventListener('click', (event) => {
-      // Захист: якщо немає точки перетину — нічого не робити
       if (!event.detail || !event.detail.intersection) return;
+
+      const touchPoint = event.detail.intersection.point;
 
       const newFlower = document.createElement('a-entity');
       
-      const touchPoint = event.detail.intersection.point;
-      newFlower.setAttribute('position', `${touchPoint.x} ${touchPoint.y + 0.05} ${touchPoint.z}`); // трохи піднімаємо, щоб не провалювалась у землю
+      // Головне виправлення: трохи опускаємо квітку + додаємо невеликий offset
+      // Спробуй значення від -0.3 до -1.0 залежно від твоєї моделі
+      newFlower.setAttribute('position', `${touchPoint.x} ${touchPoint.y - 0.4} ${touchPoint.z}`);
       
-      // Випадковий поворот для природності
+      // Випадковий поворот
       const rotY = Math.random() * 360;
       newFlower.setAttribute('rotation', `0 ${rotY} 0`);
       
-      // Початковий дуже маленький розмір
+      // Початковий розмір
       newFlower.setAttribute('scale', '0.01 0.01 0.01');
       newFlower.setAttribute('visible', 'false');
       
-      // Модель квітки
       newFlower.setAttribute('gltf-model', '#flowerModel');
       
-      // Додаємо в сцену
       this.el.sceneEl.appendChild(newFlower);
 
-      // Анімація росту після завантаження моделі
       newFlower.addEventListener('model-loaded', () => {
         newFlower.setAttribute('visible', 'true');
-        
         newFlower.setAttribute('animation', {
           property: 'scale',
-          to: '0.75 0.75 0.75',     // можеш змінити на 0.6 або 0.9, якщо квітка надто велика/мала
+          to: '0.75 0.75 0.75',
           easing: 'easeOutElastic',
-          dur: 1400,
-          loop: false
+          dur: 1400
         });
       });
 
-      // Опціонально: лог для дебагу
-      console.log('🌸 Квітка посаджена в точці:', touchPoint);
+      console.log('🌸 Квітка посаджена. Y =', touchPoint.y);
     });
   }
 });
