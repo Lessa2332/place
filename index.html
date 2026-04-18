@@ -6,29 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="robots" content="noindex, nofollow">
   
-  <!-- Favicon з емоджі -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
   
-  <!-- Політика безпеки (CSP) – пом'якшена для 8th Wall, але без небезпечних джерел -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' https://aframe.io https://cdn.aframe.io 'unsafe-eval' 'unsafe-inline';
     style-src 'self' 'unsafe-inline';
     media-src 'self' blob: data:;
-    connect-src 'self' data: blob:;
+    connect-src 'self' data: blob: https://aframe.io https://cdn.aframe.io;
     img-src 'self' data: https://cdn.aframe.io;
     frame-src 'none';
     worker-src 'self' blob:;
     font-src 'self' data:;
   ">
 
-  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-
-  <!-- Локальний 8th Wall Engine Binary -->
   <script src="xr.js" async data-preload-chunks="slam"></script>
-
-  <!-- Компонент посадки квітів -->
   <script src="tap-place.js"></script>
 
   <style>
@@ -44,7 +37,7 @@
       border-radius: 28px;
       text-align: center;
       z-index: 1000;
-      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      font-family: system-ui, sans-serif;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       border: 1px solid rgba(255,255,255,0.2);
     }
@@ -63,10 +56,6 @@
       font-weight: bold;
       cursor: pointer;
       color: white;
-      transition: transform 0.1s ease;
-    }
-    #camera-consent button:active {
-      transform: scale(0.97);
     }
     #camera-consent .decline {
       background: #f44336;
@@ -79,28 +68,21 @@
       padding: 6px 12px;
       border-radius: 20px;
       font-size: 11px;
-      font-family: sans-serif;
       z-index: 1000;
     }
     .privacy-link a {
       color: #ddd;
       text-decoration: none;
     }
-    .privacy-link a:hover {
-      text-decoration: underline;
-      color: white;
-    }
   </style>
 </head>
 <body>
-
   <div id="camera-consent">
-    <p>📸 <strong>Для гри потрібна камера</strong><br>Відео не записується і не передається. Жодні дані не збираються.</p>
+    <p>📸 <strong>Для гри потрібна камера</strong><br>Відео не записується. Дані не збираються.</p>
     <button id="accept-camera">🌼 Дозволити</button>
     <button id="decline-camera" class="decline">❌ Відмовитись</button>
   </div>
 
-  <!-- AR-сцена – без background="color" -->
   <a-scene
     id="scene"
     embedded
@@ -115,11 +97,9 @@
 
     <a-camera id="camera" raycaster="objects: .cantap" cursor="fuse: false; rayOrigin: mouse"></a-camera>
 
-    <!-- Освітлення -->
     <a-entity light="type: directional; intensity: 1.0; castShadow: true" position="4 12 6"></a-entity>
     <a-light type="ambient" intensity="0.75"></a-light>
 
-    <!-- Невидима земля для рейкастингу -->
     <a-box
       id="ground"
       class="cantap"
@@ -129,7 +109,6 @@
       visible="false"
     ></a-box>
 
-    <!-- Група для тексту: площина-фон + текст (без атрибута background) -->
     <a-plane
       position="0 1.7 -2.75"
       width="3.4"
@@ -156,19 +135,10 @@
     const consentDiv = document.getElementById('camera-consent');
     const acceptBtn = document.getElementById('accept-camera');
     const declineBtn = document.getElementById('decline-camera');
-    const scene = document.getElementById('scene');
 
     acceptBtn.onclick = () => {
       consentDiv.style.display = 'none';
-      if (scene.components && scene.components['xrweb']) {
-        scene.components['xrweb'].startSession();
-      } else {
-        setTimeout(() => {
-          if (scene.components && scene.components['xrweb']) {
-            scene.components['xrweb'].startSession();
-          }
-        }, 500);
-      }
+      console.log('✅ Камера дозволена, AR запускається автоматично');
     };
 
     declineBtn.onclick = () => {
