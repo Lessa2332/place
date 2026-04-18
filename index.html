@@ -6,32 +6,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="robots" content="noindex, nofollow">
   
-  <!-- Favicon з емоджі -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
   
-  <!-- Політика безпеки (CSP) – пом'якшена для 8th Wall, але без зовнішніх запитів -->
+  <!-- CSP з дозволом для шрифтів та 8th Wall -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' https://aframe.io 'unsafe-eval' 'unsafe-inline';
+    script-src 'self' https://aframe.io https://cdn.aframe.io 'unsafe-eval' 'unsafe-inline';
     style-src 'self' 'unsafe-inline';
     media-src 'self' blob:;
-    connect-src 'self' data: blob: https://aframe.io;
+    connect-src 'self' data: blob: https://aframe.io https://cdn.aframe.io;
     img-src 'self' data:;
     frame-src 'none';
     worker-src 'self' blob:;
+    font-src 'self' https://cdn.aframe.io data:;
   ">
 
-  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-
-  <!-- Локальний 8th Wall Engine Binary (без хмари) -->
   <script src="xr.js" async data-preload-chunks="slam"></script>
-
-  <!-- Компонент посадки квітів -->
   <script src="tap-place.js"></script>
 
   <style>
-    /* Стиль для повідомлення про камеру (той самий) */
+    /* стилі без змін */
     #camera-consent {
       position: fixed;
       bottom: 20px;
@@ -94,19 +89,18 @@
 </head>
 <body>
 
-  <!-- Повідомлення про камеру (згода) -->
   <div id="camera-consent">
     <p>📸 <strong>Для гри потрібна камера</strong><br>Відео не записується і не передається в інтернет. Жодні дані не збираються.</p>
     <button id="accept-camera">🌼 Дозволити</button>
     <button id="decline-camera" class="decline">❌ Відмовитись</button>
   </div>
 
-  <!-- AR-сцена -->
   <a-scene
     id="scene"
     embedded
     renderer="colorManagement: true"
     tap-place
+    background="color: #87CEEB"
     xrweb="allowedDevices: any"
     ar-hit-test="mode: plane; targetRayMode: tracked-pointer"
   >
@@ -119,7 +113,6 @@
     <a-entity light="type: directional; intensity: 1.2; castShadow: true" position="5 15 8"></a-entity>
     <a-light type="ambient" intensity="0.7"></a-light>
 
-    <!-- Невидима "земля" для кліків -->
     <a-box
       id="ground"
       class="cantap"
@@ -129,7 +122,6 @@
       visible="false"
     ></a-box>
 
-    <!-- Текст-інструкція -->
     <a-text
       value="🌸 Торкнись підлоги або столу, щоб посадити квітку"
       position="0 1.6 -2.5"
@@ -147,7 +139,6 @@
   </div>
 
   <script>
-    // Згода на камеру (без зберігання даних)
     const consentDiv = document.getElementById('camera-consent');
     const acceptBtn = document.getElementById('accept-camera');
     const declineBtn = document.getElementById('decline-camera');
@@ -155,17 +146,8 @@
 
     acceptBtn.onclick = () => {
       consentDiv.style.display = 'none';
-      // Запускаємо AR-сесію (8th Wall сам запросить дозвіл)
-      if (scene.components && scene.components['xrweb']) {
-        scene.components['xrweb'].startSession();
-      } else {
-        // Якщо компонент ще не готовий, зачекаємо трохи
-        setTimeout(() => {
-          if (scene.components && scene.components['xrweb']) {
-            scene.components['xrweb'].startSession();
-          }
-        }, 500);
-      }
+      // 8th Wall сам активується через атрибут xrweb на сцені
+      // Додатково нічого не потрібно
     };
 
     declineBtn.onclick = () => {
