@@ -2,44 +2,39 @@
 
 AFRAME.registerComponent('tap-place', {
   init() {
-    const ground = document.getElementById('ground');
-    
-    if (!ground) {
-      console.error('❌ Ground element not found!');
-      return;
-    }
+    const scene = this.el.sceneEl;
 
-    ground.addEventListener('click', (event) => {
+    scene.addEventListener('click', (event) => {
       if (!event.detail?.intersection) return;
 
       const point = event.detail.intersection.point;
 
       const newFlower = document.createElement('a-entity');
 
-      // Головне виправлення висоти — опускаємо квітку
-      newFlower.setAttribute('position', `${point.x} ${point.y - 0.45} ${point.z}`);
+      // Опускаємо трохи нижче точки hit-test (найкращий компроміс)
+      newFlower.setAttribute('position', `${point.x} ${point.y - 0.08} ${point.z}`);
 
       const rotY = Math.random() * 360;
       newFlower.setAttribute('rotation', `0 ${rotY} 0`);
 
-      newFlower.setAttribute('scale', '0.01 0.01 0.01');
+      newFlower.setAttribute('scale', '0.02 0.02 0.02');
       newFlower.setAttribute('visible', 'false');
 
       newFlower.setAttribute('gltf-model', '#flowerModel');
 
-      this.el.sceneEl.appendChild(newFlower);
+      scene.appendChild(newFlower);
 
       newFlower.addEventListener('model-loaded', () => {
         newFlower.setAttribute('visible', 'true');
         newFlower.setAttribute('animation', {
           property: 'scale',
-          to: '0.72 0.72 0.72',
+          to: '0.75 0.75 0.75',
           easing: 'easeOutElastic',
-          dur: 1450
+          dur: 1400
         });
       });
 
-      console.log(`🌸 Квітка посаджена | Y = ${point.y.toFixed(2)}`);
+      console.log(`🌸 Квітка посаджена на Y = ${point.y.toFixed(3)}`);
     });
   }
 });
