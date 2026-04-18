@@ -9,23 +9,23 @@
   <!-- Favicon з емоджі -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
   
-  <!-- Політика безпеки (CSP) – дозволяє 8th Wall та завантаження шрифтів A-Frame -->
+  <!-- Політика безпеки (CSP) – оптимізована для 8th Wall та A-Frame -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' https://aframe.io https://cdn.aframe.io 'unsafe-eval' 'unsafe-inline';
     style-src 'self' 'unsafe-inline';
-    media-src 'self' blob:;
+    media-src 'self' blob: data:;
     connect-src 'self' data: blob: https://aframe.io https://cdn.aframe.io;
     img-src 'self' data: https://cdn.aframe.io;
     frame-src 'none';
     worker-src 'self' blob:;
-    font-src 'self' https://cdn.aframe.io data:;
+    font-src 'self' data:;
   ">
 
   <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-  <!-- Локальний 8th Wall Engine Binary -->
+  <!-- Локальний 8th Wall Engine Binary (покласти xr.js і xr-slam.js в корінь) -->
   <script src="xr.js" async data-preload-chunks="slam"></script>
 
   <!-- Компонент посадки квітів -->
@@ -94,20 +94,21 @@
 </head>
 <body>
 
+  <!-- Повідомлення про камеру -->
   <div id="camera-consent">
     <p>📸 <strong>Для гри потрібна камера</strong><br>Відео не записується і не передається в інтернет. Жодні дані не збираються.</p>
     <button id="accept-camera">🌼 Дозволити</button>
     <button id="decline-camera" class="decline">❌ Відмовитись</button>
   </div>
 
+  <!-- AR-сцена (без background="color" – камера показує реальний світ) -->
   <a-scene
     id="scene"
     embedded
-    renderer="colorManagement: true"
+    renderer="colorManagement: true; antialias: true"
     tap-place
     xrweb="allowedDevices: any"
     ar-hit-test="mode: plane; targetRayMode: tracked-pointer"
-    background="color: #87CEEB"
   >
     <a-assets>
       <a-asset-item id="flowerModel" src="flower.glb"></a-asset-item>
@@ -115,39 +116,30 @@
 
     <a-camera id="camera" raycaster="objects: .cantap" cursor="fuse: false; rayOrigin: mouse"></a-camera>
 
-    <a-entity light="type: directional; intensity: 1.2; castShadow: true" position="5 15 8"></a-entity>
-    <a-light type="ambient" intensity="0.7"></a-light>
+    <!-- Освітлення -->
+    <a-entity light="type: directional; intensity: 1.0; castShadow: true" position="4 12 6"></a-entity>
+    <a-light type="ambient" intensity="0.75"></a-light>
 
-    <!-- Невидима "земля" для кліків -->
+    <!-- Невидима "земля" для рейкастингу -->
     <a-box
       id="ground"
       class="cantap"
-      scale="3000 0.02 3000"
-      position="0 -0.1 0"
-      material="shader: flat; color: #228B22; transparent: true; opacity: 0.0"
+      scale="4000 0.05 4000"
+      position="0 -0.02 0"
+      material="shader: flat; color: #228B22; transparent: true; opacity: 0"
       visible="false"
     ></a-box>
 
-    <!-- Текст-інструкція без вбудованого фону (щоб уникнути помилки background) -->
+    <!-- Текст із вбудованим шрифтом A-Frame (без зовнішніх ресурсів) -->
     <a-text
       value="🌸 Торкнись підлоги або столу, щоб посадити квітку"
-      position="0 1.6 -2.5"
+      position="0 1.7 -2.8"
       align="center"
       color="#ffffff"
-      width="2.8"
-      font="https://cdn.aframe.io/fonts/Exo2Bold.fnt"
+      width="3.0"
+      background="true"
+      background-color="rgba(0,0,0,0.65)"
     ></a-text>
-    
-    <!-- Окрема площина для фону тексту (щоб текст читався) -->
-    <a-plane
-      position="0 1.6 -2.45"
-      width="3.2"
-      height="0.6"
-      color="black"
-      opacity="0.6"
-      transparent="true"
-      material="side: double"
-    ></a-plane>
   </a-scene>
 
   <div class="privacy-link">
@@ -162,6 +154,7 @@
 
     acceptBtn.onclick = () => {
       consentDiv.style.display = 'none';
+      // Запускаємо AR-сесію 8th Wall (якщо компонент готовий)
       if (scene.components && scene.components['xrweb']) {
         scene.components['xrweb'].startSession();
       } else {
