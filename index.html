@@ -8,14 +8,14 @@
   <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-  <!-- 8th Wall XR Engine Binary -->
+  <!-- 8th Wall XR Engine Binary (реальний AR) -->
   <script src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@latest/dist/xr.js"
           async
           crossorigin="anonymous"
           data-preload-chunks="slam">
   </script>
 
-  <!-- Твій скрипт -->
+  <!-- Твій компонент -->
   <script src="tap-place.js"></script>
 </head>
 <body>
@@ -23,7 +23,7 @@
     xrweb="allowedDevices: any"
     renderer="colorManagement: true"
     tap-place
-    background="color: #87CEEB"
+    embedded
     ar-hit-test="mode: plane; targetRayMode: tracked-pointer">
 
     <!-- Активи -->
@@ -31,38 +31,34 @@
       <a-asset-item id="flowerModel" src="flower.glb"></a-asset-item>
     </a-assets>
 
-    <!-- Камера -->
+    <!-- Камера (без фіксованої позиції — AR сам керує) -->
     <a-camera
       id="camera"
-      position="0 1.6 0"
       raycaster="objects: .cantap"
       cursor="fuse: false; rayOrigin: mouse;">
     </a-camera>
 
-    <!-- Освітлення -->
-    <a-entity
-      light="type: directional; intensity: 1.0; castShadow: true"
-      position="5 15 8">
-    </a-entity>
-    <a-light type="ambient" intensity="0.65"></a-light>
+    <!-- Освітлення (AR добре працює з ambient + directional) -->
+    <a-entity light="type: directional; intensity: 1.0; castShadow: true" position="5 15 8"></a-entity>
+    <a-light type="ambient" intensity="0.7"></a-light>
 
-    <!-- Земля для тапу (оптимізована під правильну висоту) -->
+    <!-- Легкий індикатор землі (необов’язковий, можна видалити після тестів) -->
     <a-box
       id="ground"
       class="cantap"
-      scale="3000 0.1 3000"
-      position="0 -0.05 0"
-      material="shader: flat; color: #228B22; transparent: true; opacity: 0.18"
-      shadow="receive: true">
+      scale="3000 0.05 3000"
+      position="0 -0.02 0"
+      material="shader: flat; color: #228B22; transparent: true; opacity: 0.12"
+      visible="false">   <!-- робимо невидимим, щоб не заважало -->
     </a-box>
 
     <!-- Екологічний текст -->
     <a-text
-      value="Не рви рослини!\nПосади віртуальну квітку і милуйся 🌸\nТапни по землі"
-      position="0 2.0 -3"
+      value="Не рви рослини!\nПосади віртуальну квітку і милуйся 🌸\nТапни по підлозі"
+      position="0 1.8 -2.5"
       align="center"
       color="#2E8B57"
-      width="3.0"
+      width="2.8"
       font="https://cdn.aframe.io/fonts/Exo2Bold.fnt">
     </a-text>
 
