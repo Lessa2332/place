@@ -12,5 +12,9 @@
 - 8th Wall XR Engine (self-hosted, open-source 2026)
 - A-Frame
 - GLTF модель квітки
+## 📚 Додаткові матеріали
 
-Автор: Олеся
+- [Посібник для батьків](docs/PARENT_GUIDE.md)
+- [Технічний документ безпеки](docs/SAFETY.md)
+- [Політика конфіденційності](privacy-policy.html)
+Автор: Олеся Бохонок
