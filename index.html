@@ -6,27 +6,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="robots" content="noindex, nofollow">
   
+  <!-- Favicon з емоджі -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
   
-  <!-- CSP з дозволом для шрифтів та 8th Wall -->
+  <!-- Політика безпеки (CSP) – дозволяє 8th Wall та завантаження шрифтів A-Frame -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' https://aframe.io https://cdn.aframe.io 'unsafe-eval' 'unsafe-inline';
     style-src 'self' 'unsafe-inline';
     media-src 'self' blob:;
     connect-src 'self' data: blob: https://aframe.io https://cdn.aframe.io;
-    img-src 'self' data:;
+    img-src 'self' data: https://cdn.aframe.io;
     frame-src 'none';
     worker-src 'self' blob:;
     font-src 'self' https://cdn.aframe.io data:;
   ">
 
+  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+  <!-- Локальний 8th Wall Engine Binary -->
   <script src="xr.js" async data-preload-chunks="slam"></script>
+
+  <!-- Компонент посадки квітів -->
   <script src="tap-place.js"></script>
 
   <style>
-    /* стилі без змін */
     #camera-consent {
       position: fixed;
       bottom: 20px;
@@ -100,9 +105,9 @@
     embedded
     renderer="colorManagement: true"
     tap-place
-    background="color: #87CEEB"
     xrweb="allowedDevices: any"
     ar-hit-test="mode: plane; targetRayMode: tracked-pointer"
+    background="color: #87CEEB"
   >
     <a-assets>
       <a-asset-item id="flowerModel" src="flower.glb"></a-asset-item>
@@ -113,6 +118,7 @@
     <a-entity light="type: directional; intensity: 1.2; castShadow: true" position="5 15 8"></a-entity>
     <a-light type="ambient" intensity="0.7"></a-light>
 
+    <!-- Невидима "земля" для кліків -->
     <a-box
       id="ground"
       class="cantap"
@@ -122,16 +128,26 @@
       visible="false"
     ></a-box>
 
+    <!-- Текст-інструкція без вбудованого фону (щоб уникнути помилки background) -->
     <a-text
       value="🌸 Торкнись підлоги або столу, щоб посадити квітку"
       position="0 1.6 -2.5"
       align="center"
       color="#ffffff"
       width="2.8"
-      background="true"
-      background-color="rgba(0,0,0,0.6)"
       font="https://cdn.aframe.io/fonts/Exo2Bold.fnt"
     ></a-text>
+    
+    <!-- Окрема площина для фону тексту (щоб текст читався) -->
+    <a-plane
+      position="0 1.6 -2.45"
+      width="3.2"
+      height="0.6"
+      color="black"
+      opacity="0.6"
+      transparent="true"
+      material="side: double"
+    ></a-plane>
   </a-scene>
 
   <div class="privacy-link">
@@ -146,8 +162,15 @@
 
     acceptBtn.onclick = () => {
       consentDiv.style.display = 'none';
-      // 8th Wall сам активується через атрибут xrweb на сцені
-      // Додатково нічого не потрібно
+      if (scene.components && scene.components['xrweb']) {
+        scene.components['xrweb'].startSession();
+      } else {
+        setTimeout(() => {
+          if (scene.components && scene.components['xrweb']) {
+            scene.components['xrweb'].startSession();
+          }
+        }, 500);
+      }
     };
 
     declineBtn.onclick = () => {
