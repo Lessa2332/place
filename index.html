@@ -6,18 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="robots" content="noindex, nofollow">
   
-  <!-- Favicon з емоджі (без зовнішніх файлів) -->
+  <!-- Favicon з емоджі -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
   
-  <!-- Політика безпеки (CSP) – блокує все зайве -->
+  <!-- Політика безпеки (CSP) – пом'якшена для 8th Wall, але без зовнішніх запитів -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' https://aframe.io;
+    script-src 'self' https://aframe.io 'unsafe-eval' 'unsafe-inline';
     style-src 'self' 'unsafe-inline';
     media-src 'self' blob:;
-    connect-src 'none';
+    connect-src 'self' data: blob: https://aframe.io;
     img-src 'self' data:;
     frame-src 'none';
+    worker-src 'self' blob:;
   ">
 
   <!-- A-Frame -->
@@ -30,7 +31,7 @@
   <script src="tap-place.js"></script>
 
   <style>
-    /* Стиль для повідомлення про камеру */
+    /* Стиль для повідомлення про камеру (той самий) */
     #camera-consent {
       position: fixed;
       bottom: 20px;
@@ -109,19 +110,12 @@
     xrweb="allowedDevices: any"
     ar-hit-test="mode: plane; targetRayMode: tracked-pointer"
   >
-    <!-- Активи -->
     <a-assets>
       <a-asset-item id="flowerModel" src="flower.glb"></a-asset-item>
     </a-assets>
 
-    <!-- Камера -->
-    <a-camera
-      id="camera"
-      raycaster="objects: .cantap"
-      cursor="fuse: false; rayOrigin: mouse"
-    ></a-camera>
+    <a-camera id="camera" raycaster="objects: .cantap" cursor="fuse: false; rayOrigin: mouse"></a-camera>
 
-    <!-- Освітлення -->
     <a-entity light="type: directional; intensity: 1.2; castShadow: true" position="5 15 8"></a-entity>
     <a-light type="ambient" intensity="0.7"></a-light>
 
@@ -135,7 +129,7 @@
       visible="false"
     ></a-box>
 
-    <!-- Текст-інструкція з емоджі -->
+    <!-- Текст-інструкція -->
     <a-text
       value="🌸 Торкнись підлоги або столу, щоб посадити квітку"
       position="0 1.6 -2.5"
@@ -148,7 +142,6 @@
     ></a-text>
   </a-scene>
 
-  <!-- Посилання на політику конфіденційності -->
   <div class="privacy-link">
     <a href="assets/privacy-policy.html" target="_blank" rel="noopener noreferrer">🔒 Політика конфіденційності</a>
   </div>
@@ -162,12 +155,17 @@
 
     acceptBtn.onclick = () => {
       consentDiv.style.display = 'none';
-      scene.setAttribute('xrweb', 'allowedDevices: any');
-      setTimeout(() => {
-        if (scene.components['xrweb']) {
-          scene.components['xrweb'].startSession();
-        }
-      }, 100);
+      // Запускаємо AR-сесію (8th Wall сам запросить дозвіл)
+      if (scene.components && scene.components['xrweb']) {
+        scene.components['xrweb'].startSession();
+      } else {
+        // Якщо компонент ще не готовий, зачекаємо трохи
+        setTimeout(() => {
+          if (scene.components && scene.components['xrweb']) {
+            scene.components['xrweb'].startSession();
+          }
+        }, 500);
+      }
     };
 
     declineBtn.onclick = () => {
