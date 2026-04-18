@@ -1,41 +1,45 @@
-// Copyright (c) 2021 8th Wall, Inc.
+// Copyright (c) 2021 8th Wall, Inc. — адаптовано для шкільного проєкту Олесі
 /* globals AFRAME */
 
-// Component that places trees where the ground is clicked
+// Компонент, який «висаджує» квітку там, де ти тапаєш
 AFRAME.registerComponent('tap-place', {
   init() {
     const ground = document.getElementById('ground')
     ground.addEventListener('click', (event) => {
-      // Create new entity for the new object
+      // Створюємо нову квітку
       const newElement = document.createElement('a-entity')
 
-      // The raycaster gives a location of the touch in the scene
+      // Точка, куди ти тапнув (з raycaster)
       const touchPoint = event.detail.intersection.point
       newElement.setAttribute('position', touchPoint)
 
+      // Випадковий поворот, щоб квіти виглядали природно
       const randomYRotation = Math.random() * 360
       newElement.setAttribute('rotation', `0 ${randomYRotation} 0`)
 
+      // Спочатку маленька і невидима
       newElement.setAttribute('visible', 'false')
       newElement.setAttribute('scale', '0.0001 0.0001 0.0001')
 
-      newElement.setAttribute('shadow', {
-        receive: false,
-      })
+      // Тінь (щоб реалістично)
+      newElement.setAttribute('shadow', { receive: false })
 
-      newElement.setAttribute('gltf-model', '#treeModel')
+      // Завантажуємо модель КВІТКИ (замість дерева)
+      newElement.setAttribute('gltf-model', '#flowerModel')
+
+      // Додаємо в сцену
       this.el.sceneEl.appendChild(newElement)
 
+      // Коли модель завантажилася — анімація росту
       newElement.addEventListener('model-loaded', () => {
-        // Once the model is loaded, we are ready to show it popping in using an animation
         newElement.setAttribute('visible', 'true')
         newElement.setAttribute('animation', {
           property: 'scale',
-          to: '7 7 7',
+          to: '0.8 0.8 0.8',        // розмір квітки (можна підкоригувати)
           easing: 'easeOutElastic',
-          dur: 800,
+          dur: 1200                  // 1.2 секунди
         })
       })
     })
-  },
+  }
 })
