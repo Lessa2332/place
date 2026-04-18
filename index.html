@@ -2,11 +2,14 @@
 <html lang="uk">
 <head>
   <meta charset="utf-8">
-  <title>Посади квітку 🌸 — AR-сад для дітей</title>
+  <title>🌸 Посади квітку — AR-сад для дітей</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="robots" content="noindex, nofollow">
   
-  <!-- Політика безпеки (CSP) – дозволяє тільки необхідне -->
+  <!-- Favicon з емоджі (без зовнішніх файлів) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+  
+  <!-- Політика безпеки (CSP) – блокує все зайве -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' https://aframe.io;
@@ -23,11 +26,11 @@
   <!-- Локальний 8th Wall Engine Binary (без хмари) -->
   <script src="xr.js" async data-preload-chunks="slam"></script>
 
-  <!-- Наш компонент для посадки квітів -->
+  <!-- Компонент посадки квітів -->
   <script src="tap-place.js"></script>
 
   <style>
-    /* Стиль для повідомлення про камеру (безпека + згода) */
+    /* Стиль для повідомлення про камеру */
     #camera-consent {
       position: fixed;
       bottom: 20px;
@@ -90,7 +93,7 @@
 </head>
 <body>
 
-  <!-- Повідомлення про камеру (згода батьків/дитини) -->
+  <!-- Повідомлення про камеру (згода) -->
   <div id="camera-consent">
     <p>📸 <strong>Для гри потрібна камера</strong><br>Відео не записується і не передається в інтернет. Жодні дані не збираються.</p>
     <button id="accept-camera">🌼 Дозволити</button>
@@ -111,7 +114,7 @@
       <a-asset-item id="flowerModel" src="flower.glb"></a-asset-item>
     </a-assets>
 
-    <!-- Камера (AR керує позицією) -->
+    <!-- Камера -->
     <a-camera
       id="camera"
       raycaster="objects: .cantap"
@@ -122,7 +125,7 @@
     <a-entity light="type: directional; intensity: 1.2; castShadow: true" position="5 15 8"></a-entity>
     <a-light type="ambient" intensity="0.7"></a-light>
 
-    <!-- Прозора "земля" для кліків (невидима, але потрібна для подій) -->
+    <!-- Невидима "земля" для кліків -->
     <a-box
       id="ground"
       class="cantap"
@@ -132,7 +135,7 @@
       visible="false"
     ></a-box>
 
-    <!-- Інструкція -->
+    <!-- Текст-інструкція з емоджі -->
     <a-text
       value="🌸 Торкнись підлоги або столу, щоб посадити квітку"
       position="0 1.6 -2.5"
@@ -151,7 +154,7 @@
   </div>
 
   <script>
-    // Проста згода на камеру (без зберігання даних)
+    // Згода на камеру (без зберігання даних)
     const consentDiv = document.getElementById('camera-consent');
     const acceptBtn = document.getElementById('accept-camera');
     const declineBtn = document.getElementById('decline-camera');
@@ -159,9 +162,7 @@
 
     acceptBtn.onclick = () => {
       consentDiv.style.display = 'none';
-      // Запускаємо AR-сесію (8th Wall сам запросить дозвіл, але ми вже отримали згоду)
       scene.setAttribute('xrweb', 'allowedDevices: any');
-      // Невелика затримка для ініціалізації
       setTimeout(() => {
         if (scene.components['xrweb']) {
           scene.components['xrweb'].startSession();
