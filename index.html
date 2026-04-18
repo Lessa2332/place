@@ -6,27 +6,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
 
-  <!-- 1. Бібліотека A-Frame -->
-  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <!-- Використовуйте 8-Frame замість стандартного A-Frame -->
+  <script src="https://cdn.8thwall.com/web/aframe/8frame-1.3.0.min.js"></script>
 
-  <!-- 2. Локальний бінарний файл 8th Wall з попереднім завантаженням SLAM -->
-  <script src="xr.js" async data-preload-chunks="slam"></script>
+  <!-- Підключаємо бінарний файл 8th Wall Engine з CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js" async crossorigin="anonymous" data-preload-chunks="slam"></script>
 
-  <!-- 3. Ваш компонент -->
+  <!-- Ваш компонент -->
   <script src="tap-place.js"></script>
 </head>
 <body>
-  <!-- Основна AR-сцена -->
-  <!-- Атрибут xrweb="allowedDevices: any" необхідний для роботи -->
-  <a-scene xrweb="allowedDevices: any" ar-hit-test="mode: plane" tap-place>
+  <!-- Додаємо компонент xrconfig для конфігурації камери (за потреби) та xrweb для world tracking -->
+  <a-scene xrconfig="allowedDevices: any" xrweb="disableWorldTracking: false" ar-hit-test="mode: plane" tap-place>
     <a-assets>
       <a-asset-item id="flowerModel" src="flower.glb"></a-asset-item>
     </a-assets>
 
-    <!-- Камера. Позиція в AR не має значення, її встановить 8th Wall -->
+    <!-- Камера -->
     <a-camera id="camera" raycaster="objects: .cantap" cursor="fuse: false; rayOrigin: mouse"></a-camera>
 
-    <!-- Освітлення для тіней -->
+    <!-- Освітлення -->
     <a-entity light="type: directional; intensity: 1.0; castShadow: true" position="4 12 6"></a-entity>
     <a-light type="ambient" intensity="0.75"></a-light>
 
